@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 }
 ```
 This uses a buffer which writes to write to the stack which also happens to be where local varibles are stored. 
-this allows the varible to be changed.The magic happens in the assembly 
+This allows the varible to be changed.The magic happens in the assembly 
 ```
 0x080483f4 <main+0>:	push   ebp
 0x080483f5 <main+1>:	mov    ebp,esp
@@ -42,6 +42,9 @@ this allows the varible to be changed.The magic happens in the assembly
 ```
 
 So first we look at how the stack is made, not all of it is important but we will see how varibles are stored on the stack and how the stackframe is built.
-let's look at how the stack is made and it's alot like lifting up a car. First in assembly EBP, and ESP point to a memory adress in the stack. 
-Push EBP loads the base pointer into the stack. So our stack is like a deck of cards which can only be drawn from the top. 
-So first the EBP is now on the stack as it is pushed onto the stack. Then the mov instruction will push 
+let's look at how the stack is made and it's alot like lifting up a car. First in assembly EBP, and ESP point to a memory adress in the stack. Push EBP loads the base pointer into the stack. So our stack is like a deck of cards which can only be drawn from the top. 
+So first the EBP is now on the stack as it is pushed onto the stack. Then the mov instruction will set the base pointer and the stack pointer (for the c program). Now the base of the stack is the also the place where the stack pointer is. 
+The next statement just is an anding operation does a and operation. The next operation moves the stack pointer 0x60 away giving the amount of space allocated by the buffer (64 charaters) since the memory adresses differ by 0x60. 
+Then the varible that is to be changed is the varible set to zero. We see it since there is a move 0 varibles into a varible 
+into exp offset 0x5c which is likely the varible (there's only 1 ). then the next few steps calls gets and loads up the buffer. Then the buffer is able to write into the stack this is how the exploit works. Note the mov and test eax eax instructions this is how we enter the if condition. if We load enough charaters into the buffer we sould overwrite the stack and too much will cause a segmentation fault. If we just enought into the stack so that it loads a stack value that is not zero since we overwritten it should hit the "You changed the varible message." 
+
